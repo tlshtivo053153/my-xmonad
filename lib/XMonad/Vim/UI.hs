@@ -10,6 +10,8 @@ module XMonad.Vim.UI
 , writeStatusBarText
 , showStatusBar
 , hideStatusBar
+, mainLoop
+, initGUI
 ) where
 
 import XMonad hiding (Position)
@@ -19,11 +21,10 @@ import XMonad.Vim.Core
 import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.UI.CommandLine as UIC
 
-import Control.Monad (when, unless)
+import Control.Monad (when, unless, void)
+import qualified Data.Text as T
 
-import Graphics.UI.Gtk ( AttrOp(..) )
-import qualified Graphics.UI.Gtk as Gtk
-import qualified System.Glib as Glib
+import qualified GI.Gtk as Gtk
 
 import qualified Data.IORef as R
 import qualified Control.Concurrent.MVar as M
@@ -74,6 +75,12 @@ writeStatusBarText :: String -> VimAction ()
 writeStatusBarText str = do
     sconfig <- asks statusBarConfig
     liftIO $ UIS.runStatusBarAction sconfig (UIS.writeStatusBarText str)
+
+mainLoop :: IO ()
+mainLoop = Gtk.main
+
+initGUI :: IO ()
+initGUI = void $ Gtk.init Nothing
 
 main :: IO ()
 main = return ()

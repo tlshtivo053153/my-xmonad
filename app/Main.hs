@@ -43,7 +43,7 @@ import Data.IORef  --global state test
 
 import Control.Concurrent
 import Control.Concurrent.MVar
-import Graphics.UI.Gtk hiding (Shrink, Expand, currentTime)
+--import Graphics.UI.Gtk hiding (Shrink, Expand, currentTime)
 
 import qualified XMonad.Vim as Vim
 import qualified Graphics.X11 as X11
@@ -74,7 +74,7 @@ baseConfig = desktopConfig
 --------------------------------------------------------------------------------
 main :: IO ()
 main = do
-    _ <- initGUI
+    _ <- Vim.initGUI
     vstate <- newIORef def
     vconf <- Vim.newVimConfig mod4Mask myVimKeys
     ----------------------------------------------------------------------------

@@ -37,23 +37,24 @@ import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.UI.CommandLine as UIC
 import qualified XMonad.Vim.Parse.Command as PC
 
-import qualified Graphics.UI.Gtk as Gtk
+--import qualified Graphics.UI.Gtk as Gtk
+import qualified GI.Gtk as Gtk
 
 newVimConfig :: KeyMask -> VimKeys -> IO VimConfig
 newVimConfig mask vimKeys = do
-  statusBar <- Gtk.windowNewPopup
-  statusBarLabel <- Gtk.labelNew (Nothing :: Maybe String)
-  Gtk.labelSetMarkup statusBarLabel "<big>=== Normal ===</big>"
-  Gtk.containerAdd statusBar statusBarLabel
-  commandLine <- Gtk.windowNew
+  --statusBar <- Gtk.windowNewPopup
+  --statusBarLabel <- Gtk.labelNew (Nothing :: Maybe String)
+  --Gtk.labelSetMarkup statusBarLabel "<big>=== Normal ===</big>"
+  --Gtk.containerAdd statusBar statusBarLabel
+  --commandLine <- Gtk.windowNew
   commandLineConfig_ <- UIC.newCompleteStatus
   statusBarConfig_ <- UIS.newStatusBarConfig
   return VimConfig
     { vimModMask = mask
-    , statusBarWin = statusBar
-    , statusBarDefaultPosition = BottomRight
-    , commandLineWin = commandLine
-    , commandLineDefaultPosition = BottomRight
+    --, statusBarWin = statusBar
+    --, statusBarDefaultPosition = BottomRight
+    --, commandLineWin = commandLine
+    --, commandLineDefaultPosition = BottomRight
     , insertKeys  = mkVimTree . parseKeymap mask $ iKey vimKeys
     , normalKeys  = mkVimTree . parseKeymap mask $ nKey vimKeys
     , commandKeys = mkVimTree . parseKeymap mask $ cKey vimKeys
@@ -102,7 +103,7 @@ startupHookVim updateState c s = do
   runVim' updateState c s $ do
       join $ asks changeModeHook <*> return Insert <*> gets mode
       join $ asks postActionHook
-  io $ forkOS Gtk.mainGUI
+  io $ forkOS mainLoop
   return ()
 
 grabKeys :: [(KeyMask, KeySym)] -> VimAction ()

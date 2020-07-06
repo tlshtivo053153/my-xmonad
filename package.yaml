@@ -21,15 +21,20 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.13 && < 5
-- xmonad == 0.15
-- xmonad-contrib == 0.16
-- gtk
-- glib
+- xmonad
+- xmonad-contrib
+- gi-gtk
+- gi-gtk-hs
+- gi-gdk
+- haskell-gi-base
+  #- gtk
+  #- glib
 - mtl
 - X11
 - containers
 - data-default
 - appar
+- text
 #- gtk == 0.15.4
 #- glib == 0.13.8.0
 

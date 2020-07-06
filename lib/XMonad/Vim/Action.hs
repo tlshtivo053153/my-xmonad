@@ -37,7 +37,7 @@ import XMonad.Util.NamedWindows (getName)
 import Numeric (showHex, readHex)
 import qualified Graphics.X11 as X11
 
-import qualified Graphics.UI.Gtk as Gtk
+--import qualified Graphics.UI.Gtk as Gtk
 
 import qualified XMonad.Actions.CopyWindow.Alternative as CWA
 

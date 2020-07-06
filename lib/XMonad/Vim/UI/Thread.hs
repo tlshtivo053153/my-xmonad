@@ -1,33 +1,36 @@
 module XMonad.Vim.UI.Thread
-( on'
-, on''
+( forkGUI
+, forkGUI'
+, constForkGUI
 ) where
 
-import Control.Monad ( void )
 import Control.Monad.IO.Class ( MonadIO(..) )
 
-import qualified Graphics.UI.Gtk as Gtk
+import Control.Monad ( void )
 
+import Data.GI.Gtk.Threading ( postGUIASync )
 import qualified Control.Concurrent.MVar as M
-import Control.Concurrent ( forkIO )
+import Control.Concurrent ( forkIO, ThreadId )
 
-on' :: MonadIO m => object -> Gtk.Signal object (m ()) -> IO a -> IO ()
-on' = on'' ()
+--  HOWTO:
+--     on object #signal =<< (forkGUI action)
+forkGUI :: IO a -> IO (IO ())
+forkGUI action = fst <$> forkGUI' action
 
-on'' :: MonadIO m => b -> object -> Gtk.Signal object (m b) -> IO a -> IO ()
-on'' r object signal action = do
-    runEvent <- M.newEmptyMVar
-    endEvent <- M.newEmptyMVar
+forkGUI' :: IO a -> IO (IO (), ThreadId)
+forkGUI' action = do
+    (runEvent, endEvent) <- (,) <$> M.newEmptyMVar <*> M.newEmptyMVar
     let action' = do
           M.takeMVar runEvent
-          Gtk.postGUIAsync $ void action
+          postGUIASync $ void action
           M.putMVar endEvent ()
           action'
-    Gtk.on object signal $ do
-      liftIO $ do
-        M.putMVar runEvent ()
-        M.takeMVar endEvent
-      return r
-    forkIO action'
-    return ()
+    let guiLoop = do
+          M.putMVar runEvent ()
+          M.takeMVar endEvent
+    threadId <- forkIO action'
+    return (guiLoop, threadId)
+
+constForkGUI :: a -> IO b -> IO (c -> IO a)
+constForkGUI r action = const . (>> return r) <$> forkGUI action
 

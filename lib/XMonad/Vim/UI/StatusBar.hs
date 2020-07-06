@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLabels  #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module XMonad.Vim.UI.StatusBar
@@ -13,13 +15,22 @@ module XMonad.Vim.UI.StatusBar
 )
 where
 
-import XMonad.Vim.UI.Utils ( Position(..), fixPosition )
-import XMonad.Vim.UI.Thread ( on', on'' )
+import XMonad.Vim.UI.Utils ( Position(..), setPosition )
+import XMonad.Vim.UI.Thread ( forkGUI, constForkGUI )
+--import UI.Thread ( on', on'' )
 
 import qualified Control.Concurrent.MVar as M
 
-import qualified Graphics.UI.Gtk as Gtk
-import           Graphics.UI.Gtk ( AttrOp(..) )
+--import qualified Graphics.UI.Gtk as Gtk
+--import           Graphics.UI.Gtk ( AttrOp(..) )
+
+import qualified Data.GI.Gtk as Gtk
+import qualified GI.Gdk as Gdk
+import Data.GI.Gtk.Threading ( postGUIASync )
+import Data.GI.Base
+
+import Data.Text (Text)
+import qualified Data.Text as T
 
 import Control.Monad ( liftM2, unless, forever, (<=<) )
 import Control.Monad.Trans (lift, liftIO)
@@ -49,8 +60,8 @@ data StatusBarConfig = StatusBarConfig
 newStatusBarConfig :: IO StatusBarConfig
 newStatusBarConfig = do
     isInitialized_ <- M.newMVar False
-    statusBarWindow_ <- Gtk.windowNewPopup
-    statusBarLabel_ <- Gtk.labelNew (Nothing :: Maybe String)
+    statusBarWindow_ <- new Gtk.Window [ #type := Gtk.WindowTypePopup ]
+    statusBarLabel_ <- new Gtk.Label [ #label := "" ]
     text_ <- M.newMVar ""
     let wrapText_ str = "<big>" ++ str ++ "</big>"
     waitShowing_ <- M.newEmptyMVar
@@ -76,29 +87,31 @@ initStatusBarWindow :: StatusBarAction ()
 initStatusBarWindow = do
     statusBarWindow' <- asks statusBarWindow
     statusBarLabel' <- asks statusBarLabel
-
-    toStatusBarAction $ Gtk.containerAdd statusBarWindow' statusBarLabel'
-
-    let showSignalAction = Gtk.postGUIAsync $ fixPosition statusBarWindow' BottomRight
-    let configureEventAction = Gtk.postGUIAsync $ fixPosition statusBarWindow' BottomRight
-    toStatusBarAction $ on' statusBarWindow' Gtk.showSignal showSignalAction
-    toStatusBarAction $ on'' False statusBarWindow' Gtk.configureEvent configureEventAction
     waitShowing' <- asks waitShowing
-    let waitShow = do
-          b <- M.takeMVar waitShowing'
-          Gtk.postGUIAsync $ if b
-            then Gtk.widgetShowAll statusBarWindow'
-            else Gtk.widgetHideAll statusBarWindow'
-          waitShow
-    toStatusBarAction $ forkIO waitShow
-    return ()
+
+    toStatusBarAction $ do
+      #add statusBarWindow' statusBarLabel'
+
+      let showSignalAction = setPosition statusBarWindow' BottomRight
+      let configureEventAction = setPosition statusBarWindow' BottomRight
+          event = const . (>> return False) <$> forkGUI configureEventAction
+      Gdk.on statusBarWindow' #show =<< forkGUI showSignalAction
+      Gdk.on statusBarWindow' #configureEvent =<< constForkGUI False configureEventAction
+      let waitShow = do
+            b <- M.takeMVar waitShowing'
+            postGUIASync $ if b
+              then #showAll statusBarWindow'
+              else #hide statusBarWindow'
+            waitShow
+      forkIO waitShow
+      return ()
 
 updateLabel :: StatusBarAction ()
 updateLabel = do
     text' <- toStatusBarAction . M.takeMVar =<< asks text
     wrapText' <- asks wrapText
     statusBarLabel' <- asks statusBarLabel
-    toStatusBarAction . Gtk.postGUIAsync $ Gtk.labelSetMarkup statusBarLabel' (wrapText' text')
+    toStatusBarAction . postGUIASync $ #setMarkup statusBarLabel' (T.pack $ wrapText' text')
     updateLabel
 
 showStatusBar :: StatusBarAction ()

@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -lXtst #-}
 
+-- exprimental
+
 module XMonad.Vim.Paste (
   sendKey''',
   sendKeyWindow''',

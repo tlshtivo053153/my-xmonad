@@ -91,6 +91,7 @@ data VimState = VimState
   , isGrab :: !Bool
   , commandLinePosition :: Position
   , statusBarPosition :: Position
+  , statusBarText :: Maybe String
   }
 
 instance Default VimState where
@@ -107,6 +108,8 @@ instance Default VimState where
     , isGrab = False
     , commandLinePosition = BottomRight
     , statusBarPosition = BottomRight
+    --, statusBarText = Just "=== Normal ==="
+    , statusBarText = Nothing
     }
 
 data VimConfig = VimConfig
@@ -195,7 +198,7 @@ keyPressVim key = do
     (match, candidate) <- candidateVimAction
     if candidate
       then match >> join (asks stackKeyHook)
-      else match >> clearStackKey >> postAction
+      else match >> join (asks stackKeyHook) >> postAction >> clearStackKey
 
 -- "a a"
 -- "a b" -> (noModMask, xK_a)

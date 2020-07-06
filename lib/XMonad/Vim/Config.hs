@@ -181,9 +181,10 @@ changeModeHook_ before after | before /= after= do
       Insert  -> return ()
       Command -> ungrabPointerVim >> hideCommandLine
     case after of
-      Normal  -> grabKeyboardVim >> grabPointerVim
-                 >> UI.writeStatusBarText "=== Normal ==="
-                 >> showStatusBar
+      Normal  -> do
+          grabKeyboardVim
+          grabPointerVim
+          showStatusBar
       Insert  -> return ()
       Command -> grabPointerVim >> showCommandLine
 changeModeHook_ _ _ = return ()
@@ -195,7 +196,7 @@ postActionHook_ = do
     case m of
         Normal ->
             if c == 0
-            then UI.writeStatusBarText "=== Normal ==="
+            then UI.updateStatusBarText
             else UI.writeStatusBarText $ show c
         Insert -> ungrabKeyboardVim
         Command -> ungrabKeyboardVim

@@ -6,6 +6,7 @@ module XMonad.Vim.UI
 , writeCommandLineText
 , getCommandLineText
 , writeStatusBarText
+, updateStatusBarText
 , showStatusBar
 , hideStatusBar
 , mainLoop
@@ -73,6 +74,14 @@ writeStatusBarText :: String -> VimAction ()
 writeStatusBarText str = do
     sconfig <- asks statusBarConfig
     liftIO $ UIS.runStatusBarAction sconfig (UIS.writeStatusBarText str)
+
+updateStatusBarText :: VimAction ()
+updateStatusBarText = do
+    sconfig <- asks statusBarConfig
+    text <- gets statusBarText
+    case text of
+        (Just text') -> writeStatusBarText text'
+        Nothing -> return ()
 
 mainLoop :: IO ()
 mainLoop = Gtk.main

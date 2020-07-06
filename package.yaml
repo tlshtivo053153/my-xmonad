@@ -27,16 +27,12 @@ dependencies:
 - gi-gtk-hs
 - gi-gdk
 - haskell-gi-base
-  #- gtk
-  #- glib
 - mtl
 - X11
 - containers
 - data-default
 - appar
 - text
-#- gtk == 0.15.4
-#- glib == 0.13.8.0
 
 library:
   source-dirs: lib

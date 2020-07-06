@@ -1,5 +1,3 @@
---  {-# LANGUAGE BangPatterns #-}
-
 module XMonad.Vim.UI
 ( showCommandLine
 , hideCommandLine

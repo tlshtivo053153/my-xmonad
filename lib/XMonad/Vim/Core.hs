@@ -26,8 +26,6 @@ module XMonad.Vim.Core
 ) where
 
 import qualified Data.Map as M
---import qualified Data.List as L
---import qualified Data.Tree as T
 import Data.Bits ( (.|.), (.&.) )
 import Data.Maybe (catMaybes, fromMaybe)
 
@@ -57,7 +55,6 @@ import qualified XMonad.Vim.UI.CommandLine as UIC
 import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.Parse.Command as PC
 
---import qualified Graphics.UI.Gtk as Gtk
 import qualified GI.Gtk as Gtk
 
 newtype VimAction a = VimAction (ReaderT VimConfig (StateT VimState X) a)
@@ -95,7 +92,6 @@ data VimState = VimState
   , commandLinePosition :: Position
   , statusBarPosition :: Position
   }
-  --deriving (Show, Read)
 
 instance Default VimState where
   def = VimState
@@ -115,10 +111,6 @@ instance Default VimState where
 
 data VimConfig = VimConfig
   { vimModMask :: !KeyMask -- modmask overwrite XConfig
---  , statusBarWin :: Gtk.Window
---  , statusBarDefaultPosition :: Position
---  , commandLineWin :: Gtk.Window
---  , commandLineDefaultPosition :: Position
   , insertKeys  :: !( VimTree (KeyMask, KeySym) (VimAction ()) )
   , normalKeys  :: !( VimTree (KeyMask, KeySym) (VimAction ()) )
   , commandKeys :: !( VimTree (KeyMask, KeySym) (VimAction ()) )
@@ -154,7 +146,6 @@ runVim' updateState c s v = do
     liftIO $ updateState s''
     return a
 
--- Normal or NormalCustom
 isNormal :: VimAction Bool
 isNormal = do
   m <- gets mode
@@ -163,7 +154,6 @@ isNormal = do
                 _              -> False
   return $ isN m
 
--- Insert or InsertCustom
 isInsert :: VimAction Bool
 isInsert = do
   m <- gets mode
@@ -172,7 +162,6 @@ isInsert = do
                 _              -> False
   return $ isI m
 
--- Command or CommandCustom
 isCommand :: VimAction Bool
 isCommand = do
   m <- gets mode

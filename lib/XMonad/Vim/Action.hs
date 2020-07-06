@@ -1,5 +1,3 @@
--- {-# LANGUAGE BangPatterns #-}
-
 module XMonad.Vim.Action
 ( replicateAction
 , countAction
@@ -37,8 +35,6 @@ import XMonad.Util.NamedWindows (getName)
 import Numeric (showHex, readHex)
 import qualified Graphics.X11 as X11
 
---import qualified Graphics.UI.Gtk as Gtk
-
 import qualified XMonad.Actions.CopyWindow.Alternative as CWA
 
 replicateAction :: Int -> VimAction a -> VimAction ()
@@ -52,9 +48,6 @@ ignoreCount x = countAction $ const x
 
 counting :: Int -> VimAction ()
 counting n = modify $ \s -> s { count = count s * 10 + n}
---    skr <- gets stackKeyReadable
---    modify $ \s -> s { stackKeyReadable = show n : skr
---                     , count = count s * 10 + n}
 
 decorateUniqueName :: WindowSpace -> Window -> X String
 decorateUniqueName ws w = do

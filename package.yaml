@@ -1,10 +1,10 @@
 name:                my-xmonad
 version:             0.1.0.0
-github:              "githubuser/my-xmonad"
+github:              "tlshtivo053153/my-xmonad"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+author:              "tlshtivo053153"
+maintainer:          "muq8inubwlxpcv4oemcazmpfwowkrco-git@yahoo.co.jp"
+copyright:           "2020 tlshtivo053153"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/my-xmonad#readme>
+description:         Please see the README on GitHub at <https://github.com/tlshtivo053153/my-xmonad#readme>
 
 dependencies:
 - base >= 4.13 && < 5

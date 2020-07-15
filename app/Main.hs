@@ -5,45 +5,33 @@ module Main where
 
 import qualified Data.Map as M
 import qualified Data.List as L
-import System.IO                       -- for xmobar
-import System.Exit  -- exitWith
+import System.IO
+import System.Exit ( exitSuccess )
 import Control.Arrow (first, second)
 
 import XMonad
 import XMonad.Layout.LayoutModifier (ModifiedLayout)
 import XMonad.Config.Desktop
-import qualified XMonad.StackSet as W  -- myManageHookShift  --use
+import qualified XMonad.StackSet as W
 
-import XMonad.Actions.CycleWS   --use
+import XMonad.Actions.CycleWS ( prevWS, nextWS, shiftToPrev, shiftToNext )
 import XMonad.Actions.WindowBringer (bringWindow)
 import XMonad.Actions.CopyWindow (copy, kill1, copyWindow)
 
-import XMonad.Hooks.DynamicLog         -- for xmobar --use
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageDocks        -- avoid xmobar area
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.ManageDocks ( AvoidStruts, avoidStruts )
 
 import XMonad.Prompt (XPConfig(..), XPPosition(..))
-import XMonad.Prompt.Window            -- pops up a prompt with window names
-import XMonad.Prompt.Shell (shellPrompt)
-import XMonad.Util.EZConfig            -- removeKeys, additionalKeys --use
-import XMonad.Util.Run(spawnPipe)      -- spawnPipe, hPutStrLn --use
+import XMonad.Prompt.Window
+import XMonad.Util.Run(spawnPipe)
 
 import XMonad.Util.Dmenu (dmenu)
-import XMonad.Util.Paste (pasteString)
 
 import qualified Data.Char as Char
 
--- local module
---import XMonad.Prompt.MultiCommand (multiCommandPrompt, mapToMultiCommand, MultiCommand(..), mcWindow, mcWindow', mcWorkspace )
---import XMonad.Prompt.PromptTest
---import XMonad.Prompt.CompleteX
 import XMonad.Vi (viModeP)
 
-import Data.IORef  --global state test
-
-import Control.Concurrent
-import Control.Concurrent.MVar
---import Graphics.UI.Gtk hiding (Shrink, Expand, currentTime)
+import Data.IORef
 
 import qualified XMonad.Vim as Vim
 import qualified Graphics.X11 as X11
@@ -52,10 +40,10 @@ import qualified Graphics.X11 as X11
 -- comment                                                                   {{{1
 --------------------------------------------------------------------------------
 
--- |
--- | "PP" is "Pretty Printing".
--- | "XP" is "X Prompt".
--- |
+--
+-- "PP" is "Pretty Printing".
+-- "XP" is "X Prompt".
+--
 
 --------------------------------------------------------------------------------
 -- baseConfig                                                                {{{1
@@ -182,7 +170,6 @@ main = do
       , ("M-S-p", spawn "gmrun")
       , ("M-S-c", kill)
       , ("M-<space>", sendMessage NextLayout)
-      --, ("M-S-<Space>", setLayout $ layoutHook conf)
       , ("M-n", refresh)
       , ("M-<Tab>", windows W.focusDown)
       , ("M-S-<Tab>", windows W.focusUp)
@@ -194,18 +181,13 @@ main = do
       , ("M-S-k", windows W.swapUp)
       , ("M-h", sendMessage Shrink)
       , ("M-l", sendMessage Expand)
-      --, ("M-t", withFocused $ windows . W.sink)
       , ("M-,", sendMessage (IncMasterN 1))
       , ("M-.", sendMessage (IncMasterN (-1)))
-      --, ("M-S-q", io (exitWith ExitSuccess))
-      --, ("M-q", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
       ]
       ++
       [ ("M-" ++ key, screenWorkspace sc >>= flip whenJust (windows . W.shift) )
         | (key, sc) <- zip ["w", "e", "r"] [0..]
       ]
-      --[ ("M" ++ m ++ k, windows $ f i) 
-      --  | (i, k) <- zip (workspaces conf) (map show ['1'..'9'])
     ----------------------------------------------------------------------------
     -- Keymap: vim mode                                                      {{{2
     ----------------------------------------------------------------------------
@@ -225,8 +207,6 @@ main = do
         , ("S-x", Vim.killAllOtherCopyWindows )
         , ("C-x", Vim.kill1Window )
         , (":", Vim.callCommand "")
-        , ("a", Vim.sendKey''' allModKeyCode X11.noModMask X11.xK_b)
-        , ("c", Vim.sendKey'''' allModKeyCode [] X11.xK_d)
         , ("f", Vim.callCommand "focus ")
         ] ++
         [ (show c, Vim.counting c) | c <- [0..9] ]

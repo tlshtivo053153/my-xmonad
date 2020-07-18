@@ -45,8 +45,6 @@ import XMonad.Core (X, XConfig(..))
 import XMonad.Util.EZConfig (mkKeymap)
 import Graphics.X11 (KeyMask, KeySym, mod4Mask, ungrabKeyboard)
 
-import XMonad.Vim.Keys (manyKeyMap2')
-
 import XMonad.Vim.Parse.Key ( parseKeymap, keyToString )
 
 import XMonad.Vim.UI.Utils ( Position(..) )

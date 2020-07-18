@@ -63,7 +63,7 @@ uniqueNameMap' = undefined
 readUniqueName :: String -> Maybe (WorkspaceId, Window)
 readUniqueName uniName = (,) ws <$> win
   where
-    ws = tail . takeWhile (/= ']') $ dropWhile (/= '[' ) uniName
+    ws = reverse . tail . takeWhile (/= '[') . dropWhile (/= ']' ) $ reverse uniName
     win = case readHex $ reverse $ takeWhile (/= ']') $ reverse uniName of
       [(w, _)] -> Just w
       _        -> Nothing

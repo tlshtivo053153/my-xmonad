@@ -1,6 +1,6 @@
 # my-xmonad
 
-## Installation
+## Requirement
 
 ### Fedora
 ```

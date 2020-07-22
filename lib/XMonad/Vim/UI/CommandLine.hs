@@ -162,6 +162,7 @@ initWindow = do
     completeEntry' <- asks completeEntry
     treeSelection <- #getSelection completeTree'
     completeListStore <- asks completeListStore
+    userInputText' <- asks userInputText
     config <- ask
 
     #add completeWindow' completeTree'
@@ -171,8 +172,8 @@ initWindow = do
           threadDelay $ 1000 * 100 
           moveOnTop completeEntry' completeWindow'
           #setMode treeSelection Gtk.SelectionModeSingle
-          -- #setText completeEntry' ""
-          runCompletion config $ updateCompletion =<< completeFunction ""
+          userInputText'' <- M.readMVar userInputText'
+          runCompletion config $ updateCompletion =<< completeFunction (T.unpack userInputText'')
           return ()
     let hideSignalAction = do
           isShow <- M.swapMVar isShowing' False

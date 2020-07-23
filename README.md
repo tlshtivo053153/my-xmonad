@@ -1,5 +1,8 @@
 # my-xmonad
 
+My xmonad config.
+Implementation vim-like keybind, status bar, and command line.
+
 ## Requirement
 
 ### Fedora

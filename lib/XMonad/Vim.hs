@@ -1,4 +1,5 @@
 module XMonad.Vim (
+  module XMonad.Vim.Main,
   module XMonad.Vim.Core,
   module XMonad.Vim.Action,
   module XMonad.Vim.Config,
@@ -7,6 +8,7 @@ module XMonad.Vim (
   module XMonad.Vim.UI
   ) where
 
+import XMonad.Vim.Main
 import XMonad.Vim.Core
 import XMonad.Vim.Action
 import XMonad.Vim.Config

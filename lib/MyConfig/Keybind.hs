@@ -14,47 +14,34 @@ import qualified XMonad.Vim as Vim
 myWindowOperation :: [(String, X ())]
 myWindowOperation =
   map (first ("M1-C-" ++)) [
-  -- Go to the next / previous workspace
     ("h"  , prevWS )
   , ("l"  , nextWS )
-
-  -- Shift the focused window to the next / previous workspace
   , ("<Right>", shiftToNext )
   , ("<Left>", shiftToPrev )
   , ("S-l", shiftToNext )
   , ("S-h", shiftToPrev )
-
-  -- Move the focus down / up
   , ("j"  , windows W.focusDown )
   , ("k"  , windows W.focusUp   )
-
-  -- Swap the focused window down / up
   , ("<Down>", windows W.swapDown )
   , ("<Up>", windows W.swapUp   )
   , ("S-j", windows W.swapDown )
   , ("S-k", windows W.swapUp   )
   ]
------------------------------------------------------------------------- ---
--- Keymap: custom commands                                               {{{1
-----------------------------------------------------------------------------
+
 mySpawn :: [(String, X ())]
 mySpawn =
   map (second spawn)
   [
     ("M-t", "lxterminal" )
-  ] --  :: [(String, X ())]
-----------------------------------------------------------------------------
--- Keymap: quit and write state file                                     {{{1
-----------------------------------------------------------------------------
+  ]
+
 myQuitWrite :: [(String, X ())]
 myQuitWrite =
   [
     ("M-S-q", writeStateToFile >> io exitSuccess )
   , ("M-q",   spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
   ]
-----------------------------------------------------------------------------
--- Keymap: default keybind                                              {{{1
-----------------------------------------------------------------------------
+
 myDefaultKey :: [(String, X ())]
 myDefaultKey =
   [ ("M-S-<Return>", spawn "lxterminal")
@@ -80,9 +67,7 @@ myDefaultKey =
   [ ("M-" ++ key, screenWorkspace sc >>= flip whenJust (windows . W.shift) )
     | (key, sc) <- zip ["w", "e", "r"] [0..]
   ]
-----------------------------------------------------------------------------
--- Keymap: vim mode                                                      {{{1
-----------------------------------------------------------------------------
+
 myVimKeys :: Vim.VimKeys
 myVimKeys = Vim.VimKeys {
   Vim.nKey =
@@ -125,8 +110,3 @@ myVimKeys = Vim.VimKeys {
       ]
     }
 
-{-
- - vim: foldmethod=marker
- - vim: foldcolumn=3
- - vim: foldlevelstart=0
--}

@@ -19,7 +19,7 @@ import XMonad.Actions.WindowBringer (windowMap', bringWindow)
 
 import System.Exit  ( exitSuccess )
 import System.Environment ( getProgName )
-import Data.List ( find )
+import Data.List ( find, isPrefixOf, isInfixOf )
 import Data.Maybe ( fromMaybe )
 import Text.Read ( readMaybe )
 
@@ -33,7 +33,8 @@ myCommand :: [( String, [PC.Command], [String] -> VimAction () )]
 myCommand mycs = do
     let f (x:xs) = maybe (return ()) (trd xs)
                    (find (\ (name, _, _) -> name == x) mycs)
-    let cs = map (\(str, next, _) -> PC.Command str next) mycs
+        f _ = return ()
+    let cs = map (\(str, next, _) -> PC.Command str isPrefixOf next) mycs
     return (f, cs)
       where
         trd xs (_, _, x) = x xs
@@ -66,7 +67,7 @@ quit = return ("quit", [], const quitAction)
 --move = undefined
 
 send :: VimAction ( String, [PC.Command], [String] -> VimAction () )
-send = return ("sendMessage", PC.toCommand $ map fst actions, f1 f)
+send = return ("sendMessage", PC.toCommand isPrefixOf $ map fst actions, f1 f)
     where
         actions = [ ("FirstLayout", sendMessage FirstLayout)
                   , ("NextLayout", sendMessage NextLayout)
@@ -112,10 +113,10 @@ completeWSWindow name f g = do
     return (name, command, windowWSAction f g)
 
 commandWorkspace :: VimAction [PC.Command]
-commandWorkspace = xToVim . asks $ PC.toCommand . workspaces . config
+commandWorkspace = xToVim . asks $ PC.toCommand isPrefixOf . workspaces . config
 
 commandWindow :: VimAction [PC.Command]
-commandWindow = xToVim $ PC.toCommand . M.keys <$> uniqueNameMap
+commandWindow = xToVim $ PC.toCommand isInfixOf . M.keys <$> uniqueNameMap
 
 workspaceAction :: (String -> WindowSet -> WindowSet) -> [String] -> VimAction ()
 workspaceAction f = f1 $ xToVim . windows . f

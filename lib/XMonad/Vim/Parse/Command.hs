@@ -12,11 +12,12 @@ import qualified Text.Appar.String as P
 import Text.Appar.String hiding ( parse )
 
 import Data.Maybe ( fromMaybe )
-import Data.List ( isPrefixOf, find )
+import Data.List ( isPrefixOf, isInfixOf, find )
 
 import Control.Arrow ( first )
 
-data Command = Command String [Command]
+type CompleteFunc = String -> String -> Bool
+data Command = Command String CompleteFunc [Command]
 
 parse :: [Command] -> String -> ([String], [String])
 parse cs = fromMaybe ([],[]) . P.parse (parseCommands cs) 
@@ -29,7 +30,7 @@ parseCommands cs = do
     many $ char ' '
     (consumed, cs') <- commandMany cs
     comp <- escape
-    let candidate = map commandName $ filter ( isPrefixOf comp . commandName) cs'
+    let candidate = map commandName $ filter (\(Command name f _) -> f comp name) cs'
     return (consumed, candidate)
 
 command :: [Command] -> Parser (String, [Command])
@@ -55,16 +56,19 @@ escapeOf :: String -> Parser Char
 escapeOf str = char '\\' *> anyChar <|> noneOf str
 
 commandName :: Command -> String
-commandName (Command str _) = str
+commandName (Command str _ _) = str
+
+commandFunc :: Command -> CompleteFunc
+commandFunc (Command _ f _) = f
 
 commandArgs :: Command -> [Command]
-commandArgs (Command _ args) = args
+commandArgs (Command _ _ args) = args
 
-loopCommand :: [String] -> [Command]
-loopCommand xs = [ Command x (loopCommand xs) | x <- xs ]
+loopCommand :: CompleteFunc -> [String] -> [Command]
+loopCommand f xs = [ Command x f (loopCommand f xs) | x <- xs ]
 
-toCommand :: [String] -> [Command]
-toCommand xs = [ Command x [] | x <- xs ]
+toCommand :: CompleteFunc -> [String] -> [Command]
+toCommand f xs = [ Command x f [] | x <- xs ]
 
 stringToEntry :: String -> String
 stringToEntry = foldr f "" where
@@ -76,14 +80,14 @@ ex1 :: [Command]
 ex1 = [echo, exec]
 
 echo :: Command
-echo = Command "echo" echoArgs
+echo = Command "echo" isPrefixOf echoArgs
 
 echoArgs :: [Command]
-echoArgs = loopCommand [ "foo", "hello", "world", "hello!", "world!" ]
+echoArgs = loopCommand isInfixOf [ "foo", "hello", "world", "hello!", "world!" ]
 
 exec :: Command
-exec = Command "exec" execArgs
+exec = Command "exec" isPrefixOf execArgs
 
 execArgs :: [Command]
-execArgs = toCommand [ "LXDE", "Xfce4", "XMonad" ]
+execArgs = toCommand isInfixOf [ "LXDE", "Xfce4", "XMonad" ]
 

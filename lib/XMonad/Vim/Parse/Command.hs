@@ -13,6 +13,7 @@ import Text.Appar.String hiding ( parse )
 
 import Data.Maybe ( fromMaybe )
 import Data.List ( isPrefixOf, isInfixOf, find )
+import qualified XMonad.Vim.CompleteFunction as CF
 
 import Control.Arrow ( first )
 
@@ -80,14 +81,14 @@ ex1 :: [Command]
 ex1 = [echo, exec]
 
 echo :: Command
-echo = Command "echo" isPrefixOf echoArgs
+echo = Command "echo" CF.isPrefixOf' echoArgs
 
 echoArgs :: [Command]
-echoArgs = loopCommand isInfixOf [ "foo", "hello", "world", "hello!", "world!" ]
+echoArgs = loopCommand CF.isInfixOf' [ "foo", "hello", "world", "hello!", "world!" ]
 
 exec :: Command
-exec = Command "exec" isPrefixOf execArgs
+exec = Command "exec" CF.isPrefixOf' execArgs
 
 execArgs :: [Command]
-execArgs = toCommand isInfixOf [ "LXDE", "Xfce4", "XMonad" ]
+execArgs = toCommand CF.isInfixOf' [ "LXDE", "Xfce4", "XMonad" ]
 

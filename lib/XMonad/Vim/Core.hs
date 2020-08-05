@@ -82,7 +82,6 @@ data VimState = VimState
   , register :: !(M.Map Register String)
   , mark :: !(M.Map Mark String)
   , searchText :: !(Maybe String)
-  , ignoreCase :: !Bool
   , stackKey :: ![(KeyMask, KeySym)]
   , stackKeyReadable :: ![String]
   , lastAction :: !(VimAction ())
@@ -99,7 +98,6 @@ instance Default VimState where
     , register = M.empty
     , mark = M.empty
     , searchText = Nothing
-    , ignoreCase = False
     , stackKey = []
     , stackKeyReadable = []
     , lastAction = return ()

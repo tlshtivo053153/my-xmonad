@@ -16,6 +16,7 @@ import qualified XMonad.StackSet as W
 import XMonad.Util.NamedWindows (getName)
 import XMonad.Actions.WindowBringer (windowMap', bringWindow)
 
+import qualified XMonad.Vim.CompleteFunction as CF
 
 import System.Exit  ( exitSuccess )
 import System.Environment ( getProgName )
@@ -67,7 +68,7 @@ quit = return ("quit", [], const quitAction)
 --move = undefined
 
 send :: VimAction ( String, [PC.Command], [String] -> VimAction () )
-send = return ("sendMessage", PC.toCommand isPrefixOf $ map fst actions, f1 f)
+send = return ("sendMessage", PC.toCommand CF.isPrefixOf' $ map fst actions, f1 f)
     where
         actions = [ ("FirstLayout", sendMessage FirstLayout)
                   , ("NextLayout", sendMessage NextLayout)
@@ -113,10 +114,10 @@ completeWSWindow name f g = do
     return (name, command, windowWSAction f g)
 
 commandWorkspace :: VimAction [PC.Command]
-commandWorkspace = xToVim . asks $ PC.toCommand isPrefixOf . workspaces . config
+commandWorkspace = xToVim . asks $ PC.toCommand CF.isPrefixOf' . workspaces . config
 
 commandWindow :: VimAction [PC.Command]
-commandWindow = xToVim $ PC.toCommand isInfixOf . M.keys <$> uniqueNameMap
+commandWindow = xToVim $ PC.toCommand CF.isInfixOf' . M.keys <$> uniqueNameMap
 
 workspaceAction :: (String -> WindowSet -> WindowSet) -> [String] -> VimAction ()
 workspaceAction f = f1 $ xToVim . windows . f

@@ -4,6 +4,7 @@ import qualified Data.Map as M
 
 import XMonad
 import XMonad.Layout.LayoutModifier (ModifiedLayout)
+import XMonad.Layout.Fullscreen (fullscreenSupport, FullscreenFull)
 import XMonad.Config.Desktop
 
 import XMonad.Hooks.ManageDocks ( AvoidStruts, avoidStruts )
@@ -18,8 +19,9 @@ import MyConfig.Layout
 import MyConfig.Xmobar
 import MyConfig.Keybind
 
-baseConfig :: XConfig (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full)))
-baseConfig = desktopConfig
+baseConfig :: XConfig (ModifiedLayout FullscreenFull (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full))))
+--baseConfig :: XConfig (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full)))
+baseConfig = fullscreenSupport $ desktopConfig
   { terminal        = myTerminal
   , modMask         = myModMask
   , workspaces      = myWorkspaces

@@ -292,22 +292,24 @@ treeViewCursorDir dir = do
       (treePath, _) <- #getCursor completeTree'
       (placedIn, treeMin, treeMax) <- runCompletion config treeViewRange
       case (dir, treePath, treeMin, treeMax) of
-         ( UpCursor, Nothing   , _   , max) -> #setCursor completeTree' max Gtk.noTreeViewColumn False
+         ( UpCursor, Nothing   , _   , max) -> #setCursor completeTree' max noTreeViewColumn False
          ( UpCursor, Just path , min , max) -> do
             relative <- #compare path min
             isSelect <- #pathIsSelected treeSelection path
             case (relative, isSelect) of
-                (_, False) -> #setCursor completeTree' max Gtk.noTreeViewColumn False
+                (_, False) -> #setCursor completeTree' max noTreeViewColumn False
                 (0, True)  -> #unselectPath treeSelection min
-                _          -> #prev path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
-         ( DownCursor, Nothing  , min , _)   -> #setCursor completeTree' min Gtk.noTreeViewColumn False
+                _          -> #prev path >> #setCursor completeTree' path noTreeViewColumn False
+         ( DownCursor, Nothing  , min , _)   -> #setCursor completeTree' min noTreeViewColumn False
          ( DownCursor, Just path, min , max) -> do
             relative <- #compare path max
             isSelect <- #pathIsSelected treeSelection path
             case (relative, isSelect) of
-              (_, False) -> #setCursor completeTree' min Gtk.noTreeViewColumn False
+              (_, False) -> #setCursor completeTree' min noTreeViewColumn False
               (0, True)  -> #unselectPath treeSelection max
-              _          -> #next path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
+              _          -> #next path >> #setCursor completeTree' path noTreeViewColumn False
+where
+      noTreeViewColumn = Nothing :: Maybe Gtk.TreeViewColumn
 
 treeViewUpCursor :: Completion (IO ())
 treeViewUpCursor = treeViewCursorDir UpCursor

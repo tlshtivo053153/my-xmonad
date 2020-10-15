@@ -2,7 +2,7 @@ module Main where
 
 import XMonad
 import XMonad.Layout.LayoutModifier (ModifiedLayout)
-import XMonad.Layout.Fullscreen (fullscreenSupport, FullscreenFull)
+import XMonad.Layout.Fullscreen (fullscreenManageHook, fullscreenEventHook, FullscreenFull)
 import XMonad.Config.Desktop
 
 import XMonad.Hooks.ManageDocks ( AvoidStruts )
@@ -15,13 +15,17 @@ import MyConfig.Layout
 import MyConfig.Xmobar
 import MyConfig.Keybind
 
-baseConfig :: XConfig (ModifiedLayout FullscreenFull (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full))))
-baseConfig = fullscreenSupport $ desktopConfig
+baseConfig :: XConfig
+  (Choose
+     (ModifiedLayout AvoidStruts (Choose Tall (Mirror Tall)))
+     (ModifiedLayout FullscreenFull (ModifiedLayout AvoidStruts Full)))
+baseConfig = desktopConfig
   { terminal        = myTerminal
   , modMask         = myModMask
   , workspaces      = myWorkspaces
-  , manageHook      = myManageHook
+  , manageHook      = myManageHook <+> fullscreenManageHook
   , layoutHook      = myLayout
+  , handleEventHook = handleEventHook desktopConfig <+> fullscreenEventHook
   }
 
 main :: IO ()

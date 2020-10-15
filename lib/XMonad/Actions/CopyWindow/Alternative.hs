@@ -19,11 +19,6 @@ modify'' n d f s = W.view (W.currentTag s) . W.modify d f . W.view n $ s
 delete'' :: (Eq s, Eq i, Eq a) => i -> a -> StackSet i l a s sd -> StackSet i l a s sd
 delete'' n w = modify'' n Nothing (W.filter (/= w))
 
--- from XMonad.StackSet.hs
-onWorkspace :: (Eq i, Eq s) => i -> (StackSet i l a s sd -> StackSet i l a s sd)
-            -> (StackSet i l a s sd -> StackSet i l a s sd)
-onWorkspace n f s = W.view (W.currentTag s) . f . W.view n $ s
-
 shift :: (Ord a, Eq s, Eq i) => i -> StackSet i l a s sd -> StackSet i l a s sd
 shift n s = maybe s (\w -> shiftWin (W.currentTag s) n w s) (W.peek s)
 
@@ -41,7 +36,4 @@ kill1' n w = do
     if W.member w $ delete'' n w s
       then windows $ delete'' n w
       else killWindow w
-
-main :: IO ()
-main = return ()
 

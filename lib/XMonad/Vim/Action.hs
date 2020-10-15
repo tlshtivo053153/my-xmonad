@@ -22,8 +22,6 @@ import qualified XMonad.Vim.UI as UI
 import qualified XMonad.Vim.UI.CommandLine as UIC
 
 import Control.Monad (join, forM, forM_, replicateM_, when )
-import Control.Monad.State (modify, state)
-import Control.Monad.IO.Class (liftIO)
 import qualified Data.Map as M
 import qualified Control.Concurrent.MVar as MVar
 
@@ -33,7 +31,6 @@ import XMonad.Actions.WindowBringer (windowMap')
 import XMonad.Actions.CopyWindow (copyWindow, kill1, killAllOtherCopies)
 import XMonad.Util.NamedWindows (getName)
 import Numeric (showHex, readHex)
-import qualified Graphics.X11 as X11
 
 import qualified XMonad.Actions.CopyWindow.Alternative as CWA
 
@@ -56,9 +53,6 @@ decorateUniqueName ws w = do
 
 uniqueNameMap :: X (M.Map String Window)
 uniqueNameMap = windowMap' decorateUniqueName
-
-uniqueNameMap' :: X (M.Map String (Window,WindowSpace) )
-uniqueNameMap' = undefined
 
 readUniqueName :: String -> Maybe (WorkspaceId, Window)
 readUniqueName uniName = (,) ws <$> win
@@ -106,9 +100,6 @@ moveWindow reg = do
 kill1Window :: VimAction ()
 kill1Window = xToVim kill1
 
-kill1WindowWS :: VimAction ()
-kill1WindowWS = undefined
-
 killAllOtherCopyWindows :: VimAction ()
 killAllOtherCopyWindows = xToVim killAllOtherCopies
 
@@ -117,9 +108,6 @@ killSafeWindow = xToVim $ do
     ss <- gets windowset
     whenJust (W.peek ss) $ \w -> when (W.member w $ delete'' w ss) $   windows $ delete'' w
     where delete'' w = W.modify Nothing (W.filter (/= w))
-
-hintFocusWindow :: VimAction ()
-hintFocusWindow = undefined
 
 changeMode :: VimMode -> VimAction ()
 changeMode after = do
@@ -153,7 +141,4 @@ cancelCommand = changeMode Normal
 
 registerAction :: [Register] -> (Register -> VimAction ()) -> String -> String -> [ (String, VimAction ()) ]
 registerAction rs action pre post = [ (pre ++ [r] ++ post, action r) | r <- rs ]
-
-main :: IO ()
-main = return ()
 

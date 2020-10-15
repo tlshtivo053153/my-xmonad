@@ -9,8 +9,6 @@ module XMonad.Vim.UI.Utils
 , moveOnTop
 , moveOnBottom
 , moveOn
---, moveOnTBInScreen
---, moveOnBTInScreen
 , resizeWindow
 , OnWidget(..)
 , Position(..)
@@ -19,11 +17,8 @@ module XMonad.Vim.UI.Utils
 where
 
 import GHC.OverloadedLabels ( IsLabel )
---import GHC.Stack ( HasCallStack )
 
-import qualified Data.GI.Base.CallStack as B.CallStack
-
-import Control.Monad (when, unless)
+import Control.Monad (when)
 
 import Data.Text ()
 import Data.Maybe ( isJust, fromJust )
@@ -34,7 +29,6 @@ import GI.Gdk ( Rectangle )
 
 --import Data.GI.Gtk ( IsLabel, Window )
 import Data.GI.Base.ShortPrelude ( Int32 )
-import Data.GI.Base.ManagedPtr ( castTo )
 
 data Position = TopLeft | TopRight | BottomLeft | BottomRight
 
@@ -132,38 +126,6 @@ moveOn position widget window = do
               OnBottom -> (baseX         , baseY + widH)
               OnLeft   -> (baseX - rootW , baseY)
               OnRight  -> (baseX + widW  , baseY)
-
----- move on top or bottom, and in screen (default:top)
---moveOnTBInScreen :: (Gtk.WidgetClass widget) => widget -> Gtk.Window -> IO ()
---moveOnTBInScreen = moveOnInScreen OnTop
---
----- move on top or bottom, and in screen (default:bottom)
---moveOnBTInScreen :: (Gtk.WidgetClass widget) => widget -> Gtk.Window -> IO ()
---moveOnBTInScreen = moveOnInScreen OnBottom
---
---moveOnInScreen :: (Gtk.WidgetClass widget) => OnWidget -> widget -> Gtk.Window -> IO ()
---moveOnInScreen position widget window = do
---  --drawWindow <- Gtk.widgetGetDrawWindow widget
---  --(drawX, drawY) <- Gtk.drawWindowGetOrigin drawWindow
---  --drawW <- Gtk.drawWindowGetWidth drawWindow
---  --drawH <- Gtk.drawWindowGetHeight drawWindow
---  (winW, winH) <- Gtk.windowGetSize window
---  --Gtk.Rectangle widX widY widW widH <- Gtk.widgetGetAllocation widget
---  --screenW <- Gtk.screenWidth
---  --screenH <- Gtk.screenHeight
---  Gtk.windowResize window widW . snd =<< Gtk.windowGetSize window
---  let (goTopX, goTopY) = (drawX + widX, drawY + widY - winH)
---      (goBotX, goBotY) = (drawX + widX, drawY + widY + widH)
---      goBotH = winH
---  let (x, y) = case (goTopY > 0, goBotY + goBotH < screenH, position) of
---        (True , _    , OnTop)    -> (goTopX, goTopY)
---        (False, True , OnTop)    -> (goBotX, goBotY)
---        (_    , True , OnBottom) -> (goBotX, goBotY)
---        (True , False, OnBottom) -> (goTopX, goTopY)
---        (False, False, _)
---          | drawY + widY > screenH - (drawY + widY + widH) -> (goTopX, goTopY)
---          | otherwise -> (goBotX, goBotY)
---  Gtk.windowMove window x y
 
 data Size = KeepSize
           | ToRight | ToLeft | ToUp | ToDown

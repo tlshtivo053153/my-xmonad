@@ -1,16 +1,12 @@
 module Main where
 
-import qualified Data.Map as M
-
 import XMonad
 import XMonad.Layout.LayoutModifier (ModifiedLayout)
 import XMonad.Layout.Fullscreen (fullscreenSupport, FullscreenFull)
 import XMonad.Config.Desktop
 
-import XMonad.Hooks.ManageDocks ( AvoidStruts, avoidStruts )
+import XMonad.Hooks.ManageDocks ( AvoidStruts )
 import XMonad.Util.Run(spawnPipe)
-
-import Data.IORef
 
 import qualified XMonad.Vim as Vim
 
@@ -20,7 +16,6 @@ import MyConfig.Xmobar
 import MyConfig.Keybind
 
 baseConfig :: XConfig (ModifiedLayout FullscreenFull (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full))))
---baseConfig :: XConfig (ModifiedLayout AvoidStruts (Choose Tall (Choose (Mirror Tall) Full)))
 baseConfig = fullscreenSupport $ desktopConfig
   { terminal        = myTerminal
   , modMask         = myModMask

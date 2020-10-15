@@ -12,7 +12,7 @@ import qualified Text.Appar.String as P
 import Text.Appar.String hiding ( parse )
 
 import Data.Maybe ( fromMaybe )
-import Data.List ( isPrefixOf, isInfixOf, find )
+import Data.List ( find )
 import qualified XMonad.Vim.CompleteFunction as CF
 
 import Control.Arrow ( first )
@@ -77,8 +77,8 @@ stringToEntry = foldr f "" where
               c == '\"' = '\\':c:str
             | otherwise = c:str
 
-ex1 :: [Command]
-ex1 = [echo, exec]
+_ex1 :: [Command]
+_ex1 = [echo, exec]
 
 echo :: Command
 echo = Command "echo" CF.isPrefixOf' echoArgs

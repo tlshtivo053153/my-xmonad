@@ -10,11 +10,8 @@ module XMonad.Vim.Parse.Key
 import Graphics.X11.Types
 
 import Control.Arrow ( first )
-import Control.Monad ( join )
 import Data.Bits ( (.|.), (.&.) )
 import Data.List ( find )
-
-import Data.Maybe ( fromMaybe )
 
 import Text.Appar.String hiding (parse)
 

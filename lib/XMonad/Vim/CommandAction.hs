@@ -20,12 +20,11 @@ import qualified XMonad.Vim.CompleteFunction as CF
 
 import System.Exit  ( exitSuccess )
 import System.Environment ( getProgName )
-import Data.List ( find, isPrefixOf, isInfixOf )
+import Data.List ( find, isPrefixOf )
 import Data.Maybe ( fromMaybe )
-import Text.Read ( readMaybe )
 
 import qualified Data.Map as M
-import Numeric (showHex, readHex)
+import Numeric (showHex)
 
 import qualified XMonad.Vim.Parse.Command as PC
 
@@ -58,15 +57,6 @@ quit :: VimAction ( String, [PC.Command], [String] -> VimAction () )
 quit = return ("quit", [], const quitAction)
     where quitAction = xToVim $ writeStateToFile >> io exitSuccess
 
---yank :: VimAction ( String, [PC.Command], [String] -> VimAction () )
---yank = completeWindow "yank" undefined
---
---paste :: VimAction ( String, [PC.Command], [String] -> VimAction () )
---paste = undefined
---
---move :: VimAction ( String, [PC.Command], [String] -> VimAction () )
---move = undefined
-
 send :: VimAction ( String, [PC.Command], [String] -> VimAction () )
 send = return ("sendMessage", PC.toCommand CF.isPrefixOf' $ map fst actions, f1 f)
     where
@@ -88,12 +78,6 @@ progNameOut :: VimAction ( String, [PC.Command], [String] -> VimAction () )
 progNameOut = return ("progNameOut", [], const progNameOutAction)
     where
       progNameOutAction = liftIO $ putStrLn =<< getProgName
-
-bash :: VimAction ( String, [PC.Command], [String] -> VimAction () )
-bash = undefined
-
-zsh :: VimAction ( String, [PC.Command], [String] -> VimAction () )
-zsh = undefined
 
 completeWindow :: String -> (Window -> WindowSet -> WindowSet)
                -> VimAction ( String, [PC.Command], [String] -> VimAction () )
@@ -123,7 +107,7 @@ workspaceAction :: (String -> WindowSet -> WindowSet) -> [String] -> VimAction (
 workspaceAction f = f1 $ xToVim . windows . f
 
 windowAction :: (Window -> WindowSet -> WindowSet) -> [String] -> VimAction ()
-windowAction f (x:xs) = xToVim $ do
+windowAction f (x:_xs) = xToVim $ do
     win <- M.lookup x <$> uniqueNameMap
     whenJust win (windows . f)
 windowAction _ _ = return ()

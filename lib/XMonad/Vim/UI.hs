@@ -20,12 +20,10 @@ import XMonad.Vim.Core
 import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.UI.CommandLine as UIC
 
-import Control.Monad (when, unless, void)
-import qualified Data.Text as T
+import Control.Monad (void)
 
 import qualified GI.Gtk as Gtk
 
-import qualified Data.IORef as R
 import qualified Control.Concurrent.MVar as M
 
 showCommandLine :: VimAction ()
@@ -77,7 +75,6 @@ writeStatusBarText str = do
 
 updateStatusBarText :: VimAction ()
 updateStatusBarText = do
-    sconfig <- asks statusBarConfig
     text <- gets statusBarText
     case text of
         (Just text') -> writeStatusBarText text'
@@ -88,7 +85,4 @@ mainLoop = Gtk.main
 
 initGUI :: IO ()
 initGUI = void $ Gtk.init Nothing
-
-main :: IO ()
-main = return ()
 

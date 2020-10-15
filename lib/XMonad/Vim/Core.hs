@@ -26,24 +26,16 @@ module XMonad.Vim.Core
 ) where
 
 import qualified Data.Map as M
-import Data.Bits ( (.|.), (.&.) )
-import Data.Maybe (catMaybes, fromMaybe)
+import Data.Maybe (fromMaybe)
 
 import XMonad hiding (Position)
 
 import Control.Arrow (second, (***), (&&&))
 
-import Data.Monoid (All(..), (<>) )
-import Control.Monad (liftM2, when, join, forM, forM_)
-import Control.Monad.Trans (lift, liftIO)
-import Control.Monad.State (StateT, MonadState, gets, modify, runStateT)
-import Control.Monad.Reader (ReaderT, MonadReader, runReaderT, asks)
-import Control.Monad.IO.Class (MonadIO)
-import Data.Default (Default(..))
-
-import XMonad.Core (X, XConfig(..))
-import XMonad.Util.EZConfig (mkKeymap)
-import Graphics.X11 (KeyMask, KeySym, mod4Mask, ungrabKeyboard)
+import Control.Monad (liftM2, when, join)
+import Control.Monad.Trans (lift)
+import Control.Monad.State (StateT, runStateT)
+import Control.Monad.Reader (ReaderT, runReaderT)
 
 import XMonad.Vim.Parse.Key ( parseKeymap, keyToString )
 
@@ -52,8 +44,6 @@ import XMonad.Vim.UI.Utils ( Position(..) )
 import qualified XMonad.Vim.UI.CommandLine as UIC
 import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.Parse.Command as PC
-
-import qualified GI.Gtk as Gtk
 
 newtype VimAction a = VimAction (ReaderT VimConfig (StateT VimState X) a)
   deriving (Functor, Applicative, Monad, MonadIO, MonadState VimState,
@@ -127,9 +117,7 @@ data VimKeys = VimKeys
   , cKey :: ![(String, VimAction ()) ]
   } 
 type VimKeyListP = [(String, VimAction ())]
-type VimKeyList  = [( (KeyMask, KeySym), VimAction () )]
 type VimKeyMapP = M.Map String (VimAction ())
-type VimKeyMap  = M.Map (KeyMask, KeySym) (VimAction ())
 
 xToVim :: X a -> VimAction a
 xToVim = VimAction . lift . lift
@@ -286,7 +274,4 @@ nullVimTree (VimTree vtree) = M.null vtree
 
 postAction :: VimAction ()
 postAction = join $ asks postActionHook
-
-main :: IO ()
-main = return ()
 

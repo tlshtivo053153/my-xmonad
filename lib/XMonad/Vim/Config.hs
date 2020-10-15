@@ -16,28 +16,16 @@ import XMonad.Vim.Parse.Key ( parseKeymap )
 import XMonad.Vim.CommandAction ( defaultCommand )
 
 import qualified Data.Map as M
-import Data.Bits ( (.|.), (.&.), setBit )
-import Data.Maybe (catMaybes)
-import Control.Arrow (first)
-
-import Control.Concurrent.MVar (newEmptyMVar)
+import Data.Bits ( setBit )
 
 import Data.Monoid (All(..))
-import Control.Monad (when, unless, forM, forM_, void, join)
-import Control.Monad.Trans (liftIO)
-import Control.Monad.State (modify, gets)
-import Control.Monad.Reader (asks)
+import Control.Monad (when, unless, forM, forM_, join)
 import Control.Concurrent (forkOS)
-
-import XMonad.Core (X, XConfig(..))
-import Graphics.X11 (KeyMask, KeySym)
 
 import qualified XMonad.Vim.UI as UI
 import qualified XMonad.Vim.UI.StatusBar as UIS
 import qualified XMonad.Vim.UI.CommandLine as UIC
 import qualified XMonad.Vim.Parse.Command as PC
-
-import qualified GI.Gtk as Gtk
 
 newVimConfig :: KeyMask -> VimKeys -> IO VimConfig
 newVimConfig mask vimKeys = do

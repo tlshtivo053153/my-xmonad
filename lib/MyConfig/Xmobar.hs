@@ -16,7 +16,7 @@ myLogHook h = dynamicLogWithPP $ wsPP { ppOutput = hPutStrLn h }
 
 wsPP :: PP
 wsPP = xmobarPP
-    { ppOrder           = \(ws:l:t:_) -> [ws, t]
+    { ppOrder           = \(ws:_:t:_) -> [ws, t]
     , ppCurrent         = xmobarColor colorGreen colorNormalbg . wrap "ws" ""
     , ppUrgent          = xmobarColor colorWhite colorNormalbg
     , ppVisible         = xmobarColor colorWhite colorNormalbg

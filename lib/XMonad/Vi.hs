@@ -29,35 +29,3 @@ viModeP normalMode insertMode = loop where
     toLoop = second (\x -> refresh >> x >> loop)
     undefVimKey key = refresh >> M.findWithDefault loop key (mkKeymap def insertMode)
 
--- TODO:
---   macro (impossible); need multi thread? like keystroke logging
---   visual mode
---   text object
---   register
---   command line
---   mark
---   count operation
---     3j == jjj
---     10h == 10 times h
---   vim global state
---     register
---     count
---     mark
---     repeat action
---   vim config (reader monad)
---     normal mode keybind
---     insert mode keybind
---     count keybind (1-9 -> 0-9 -> 0-9 -> ...)
---     mark keybind (e.g. m)
---     repeat keybind (e.g. .)
---     hint keybind (e.g. f)
---     count action :: Int -> Action
---     search keybind (e.g. / n N)
---     yank keybind (e.g. yy)
---     select register keybind (e.g. ")
---   follow hint
---   repeat action
---   search
---   yank and paste
---   vim action
-

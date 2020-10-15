@@ -29,11 +29,10 @@ import qualified GI.Gdk as Gdk
 import Data.GI.Gtk.Threading ( postGUIASync )
 import Data.GI.Base
 
-import Data.Text (Text)
 import qualified Data.Text as T
 
-import Control.Monad ( liftM2, unless, forever, (<=<) )
-import Control.Monad.Trans (lift, liftIO)
+import Control.Monad ( liftM2, unless )
+import Control.Monad.Trans (liftIO)
 import Control.Monad.Reader (ReaderT, MonadReader, runReaderT, asks, ask)
 import Control.Monad.IO.Class (MonadIO)
 import Control.Concurrent (forkIO)
@@ -94,7 +93,6 @@ initStatusBarWindow = do
 
       let showSignalAction = setPosition statusBarWindow' BottomRight
       let configureEventAction = setPosition statusBarWindow' BottomRight
-          event = const . (>> return False) <$> forkGUI configureEventAction
       Gdk.on statusBarWindow' #show =<< forkGUI showSignalAction
       Gdk.on statusBarWindow' #configureEvent =<< constForkGUI False configureEventAction
       let waitShow = do

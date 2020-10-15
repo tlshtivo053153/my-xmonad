@@ -19,7 +19,7 @@ module XMonad.Vim.UI.CommandLine
 ) where
 
 import XMonad.Vim.Parse.Command ( Command, parse, parse', stringToEntry )
-import XMonad.Vim.UI.Utils ( Position(..), OnWidget(..), Size(..), setPosition, resizeWindow, moveOnTop )
+import XMonad.Vim.UI.Utils ( Position(..), Size(..), setPosition, resizeWindow, moveOnTop )
 import XMonad.Vim.UI.Thread ( forkGUI, constForkGUI )
 
 import Control.Concurrent ( forkIO, threadDelay )
@@ -34,7 +34,7 @@ import qualified Data.GI.Base.GType as GT
 import Control.Monad (liftM2, unless, forM_, when, join, (<=<) )
 import qualified Data.Text as T
 
-import Control.Monad.Trans (lift, liftIO)
+import Control.Monad.Trans (liftIO)
 import Control.Monad.Reader (ReaderT, MonadReader, runReaderT, asks, ask)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Default
@@ -161,14 +161,13 @@ initWindow = do
     completeTree' <- asks completeTree
     completeEntry' <- asks completeEntry
     treeSelection <- #getSelection completeTree'
-    completeListStore <- asks completeListStore
     userInputText' <- asks userInputText
     config <- ask
 
     #add completeWindow' completeTree'
 
     let showSignalAction = do
-          isShow <- M.swapMVar isShowing' True
+          M.swapMVar isShowing' True
           threadDelay $ 1000 * 100 
           moveOnTop completeEntry' completeWindow'
           #setMode treeSelection Gtk.SelectionModeSingle
@@ -176,7 +175,7 @@ initWindow = do
           runCompletion config $ updateCompletion =<< completeFunction (T.unpack userInputText'')
           return ()
     let hideSignalAction = do
-          isShow <- M.swapMVar isShowing' False
+          M.swapMVar isShowing' False
           #setMode treeSelection Gtk.SelectionModeNone
     let configureEventAction = do
           moveOnTop completeEntry' completeWindow'
@@ -189,7 +188,6 @@ initWindow = do
 initEntry :: Completion ()
 initEntry = do
     completeEntry' <- asks completeEntry
-    completeWindow' <- asks completeWindow
     isInputUser' <- asks isInputUser
     userInputText' <- asks userInputText
     
@@ -221,7 +219,7 @@ initTree = do
     treeViewColumn <- new Gtk.TreeViewColumn []
     cellRendererText <- new Gtk.CellRendererText []
     #packStart treeViewColumn cellRendererText False
-    #setCellDataFunc treeViewColumn cellRendererText $ Just $ \layout renderer model iter -> do
+    #setCellDataFunc treeViewColumn cellRendererText $ Just $ \_layout renderer model iter -> do
         text <- fromGValue =<< #getValue model iter 0 :: IO (Maybe T.Text)
         cell <- castTo Gtk.CellRendererText renderer
         case (text, cell) of
@@ -265,24 +263,6 @@ oneSelection = do
 
 data CursorDir = UpCursor | DownCursor
 
---treeViewCursorDir :: CursorDir -> Completion (IO ())
---treeViewCursorDir dir = do
---    completeTree' <- asks completeTree
---    treeSelection <- #getSelection completeTree'
---    (treePaths, _) <- treeViewRows
---    (placedIn, treeMin, treeMax) <- treeViewRange
---
---    --let showPosition = #getColumn completeTree' 0 >>= \(Just c) -> #cellGetPosition c (undefined :: Gtk.CellRenderer) >>= print
---    return $ case (dir, treePaths, treeMin, treeMax) of
---       ( UpCursor   , []     , _   , max)               -> putStrLn "up1" >> #setCursor completeTree' max Gtk.noTreeViewColumn False
---       --( UpCursor   , [path] , min , _) | min /= path   -> putStrLn "up2" >> #down path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
---       ( UpCursor   , [path] , min , _) | min /= path   -> putStrLn "up2" >> #prev path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
---       ( UpCursor   , _      , min , _)                 -> putStrLn "up3" >> #unselectPath treeSelection min
---       ( DownCursor , []     , min , _)                 -> putStrLn "down1" >> #setCursor completeTree' min Gtk.noTreeViewColumn False
---       --( DownCursor , [path] , _   , max) | max /= path -> putStrLn "down2" >> #up path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
---       ( DownCursor , [path] , _   , max) | max /= path -> putStrLn "down2" >> #next path >> #setCursor completeTree' path Gtk.noTreeViewColumn False
---       ( DownCursor , _      , _   , max)               -> putStrLn "down3" >> #unselectPath treeSelection max
-
 treeViewCursorDir :: CursorDir -> Completion (IO ())
 treeViewCursorDir dir = do
     completeTree' <- asks completeTree
@@ -290,7 +270,7 @@ treeViewCursorDir dir = do
     config <- ask
     return $ do
       (treePath, _) <- #getCursor completeTree'
-      (placedIn, treeMin, treeMax) <- runCompletion config treeViewRange
+      (_, treeMin, treeMax) <- runCompletion config treeViewRange
       case (dir, treePath, treeMin, treeMax) of
          ( UpCursor, Nothing   , _   , max) -> #setCursor completeTree' max noTreeViewColumn False
          ( UpCursor, Just path , min , max) -> do
@@ -308,7 +288,7 @@ treeViewCursorDir dir = do
               (_, False) -> #setCursor completeTree' min noTreeViewColumn False
               (0, True)  -> #unselectPath treeSelection max
               _          -> #next path >> #setCursor completeTree' path noTreeViewColumn False
-where
+    where
       noTreeViewColumn = Nothing :: Maybe Gtk.TreeViewColumn
 
 treeViewUpCursor :: Completion (IO ())
@@ -324,36 +304,10 @@ completeTreeGetSelected =
 
 treeViewSelectedText :: Completion (Maybe T.Text)
 treeViewSelectedText = do
-    --(isSelected, model, iter) <-
-    --    toCompletion
-    --    . (#getSelected <=< #getSelection)
-    --    =<< asks completeTree
     (isSelected, model, iter) <- completeTreeGetSelected
-    let r = if isSelected then Just (model, iter) else Nothing
     toCompletion $ if isSelected
         then fromGValue =<< #getValue model iter 0
         else return Nothing
-
-treeViewRow :: Completion (Maybe Int32)
-treeViewRow = do
---    (isSelected, model, iter) <-
---        toCompletion
---        . (#getSelected <=< #getSelection)
---        =<< asks completeTree
-    (isSelected, _, iter) <- completeTreeGetSelected
-    if isSelected
-      then Just <$> get iter #stamp
-      else return Nothing
-
-treeViewRow' :: Completion (Maybe (Gtk.TreeModel, Gtk.TreeIter))
-treeViewRow' = do
-    (isSelected, model, iter) <- completeTreeGetSelected
-    return $ if isSelected then Just (model, iter) else Nothing
-
-treeViewRows :: Completion ([Gtk.TreePath], Gtk.TreeModel)
-treeViewRows =
-    (#getSelectedRows <=< #getSelection)
-    =<< asks completeTree
 
 treeViewRange :: Completion (Bool, Gtk.TreePath, Gtk.TreePath)
 treeViewRange =

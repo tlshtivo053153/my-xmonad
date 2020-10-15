@@ -4,8 +4,6 @@ module XMonad.Vim.UI.Thread
 , constForkGUI
 ) where
 
-import Control.Monad.IO.Class ( MonadIO(..) )
-
 import Control.Monad ( void )
 
 import Data.GI.Gtk.Threading ( postGUIASync )

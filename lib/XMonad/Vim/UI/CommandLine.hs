@@ -150,8 +150,12 @@ initMainWindow = do
           #showAll completeWindow'
           #present completeWindow'
     let hideSignalAction = #hide completeWindow'
-    toCompletion $ on mainWindow' #show =<< forkGUI showSignalAction
-    toCompletion $ on mainWindow' #hide =<< forkGUI hideSignalAction
+    do
+      action <- liftIO $ forkGUI showSignalAction
+      toCompletion $ on mainWindow' #show action
+    do
+      action <- liftIO $ forkGUI hideSignalAction
+      toCompletion $ on mainWindow' #hide action
     return ()
 
 initWindow :: Completion ()
@@ -180,9 +184,15 @@ initWindow = do
     let configureEventAction = do
           moveOnTop completeEntry' completeWindow'
           #present completeWindow'
-    toCompletion $ on completeWindow' #show =<< forkGUI showSignalAction
-    toCompletion $ on completeWindow' #hide =<< forkGUI hideSignalAction
-    toCompletion $ on completeWindow' #configureEvent =<< constForkGUI False configureEventAction
+    do
+      action <- liftIO $ forkGUI showSignalAction
+      toCompletion $ on completeWindow' #show action
+    do
+      action <- liftIO $ forkGUI hideSignalAction
+      toCompletion $ on completeWindow' #hide action
+    do
+      action <- liftIO $ constForkGUI False configureEventAction
+      toCompletion $ on completeWindow' #configureEvent action
     return ()
 
 initEntry :: Completion ()
@@ -202,7 +212,9 @@ initEntry = do
             entryText <- #getText completeEntry'
             M.swapMVar userInputText' entryText
             update (T.unpack entryText)
-    toCompletion $ on completeEntry' #changed =<< forkGUI editableChangedAction
+    do
+      action <- liftIO $ forkGUI editableChangedAction
+      toCompletion $ on completeEntry' #changed action
     return ()
 
 initTree :: Completion ()
@@ -232,7 +244,9 @@ initTree = do
 
     treeSelection <- #getSelection completeTree'
     let oneSelection' = runCompletion config oneSelection
-    toCompletion $ on treeSelection #changed =<< forkGUI (join oneSelection')
+    do
+      action <- liftIO $ forkGUI (join oneSelection')
+      toCompletion $ on treeSelection #changed action
     return ()
 
 oneSelection :: Completion (IO ())

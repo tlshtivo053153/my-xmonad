@@ -14,7 +14,7 @@ import XMonad.Vim.Core
 import XMonad hiding ( focus, restart )
 import qualified XMonad.StackSet as W
 import XMonad.Util.NamedWindows (getName)
-import XMonad.Actions.WindowBringer (windowMap', bringWindow)
+import XMonad.Actions.WindowBringer (windowMap', bringWindow, WindowBringerConfig(..))
 
 import qualified XMonad.Vim.CompleteFunction as CF
 
@@ -72,7 +72,7 @@ send = return ("sendMessage", PC.toCommand CF.isPrefixOf' $ map fst actions, f1 
 restart :: VimAction ( String, [PC.Command], [String] -> VimAction () )
 restart = return ("restart", [], const restartAction)
     where
-      restartAction = spawn =<< (++ " --restart") <$> liftIO getProgName
+      restartAction = spawn . (++ " --restart") =<< liftIO getProgName
 
 progNameOut :: VimAction ( String, [PC.Command], [String] -> VimAction () )
 progNameOut = return ("progNameOut", [], const progNameOutAction)
@@ -135,5 +135,10 @@ decorateUniqueName ws w = do
     return $  name ++ "[" ++ W.tag ws ++ "]" ++ showHex w ""
 
 uniqueNameMap :: X (M.Map String Window)
-uniqueNameMap = windowMap' decorateUniqueName
+uniqueNameMap = windowMap' $ WindowBringerConfig
+                  { menuCommand = "echo"
+                  , menuArgs = []
+                  , windowTitler = decorateUniqueName
+                  , windowFilter = const (return True)
+                  }
 

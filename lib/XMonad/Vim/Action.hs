@@ -27,7 +27,7 @@ import qualified Control.Concurrent.MVar as MVar
 
 import XMonad hiding (moveWindow)
 import qualified XMonad.StackSet as W
-import XMonad.Actions.WindowBringer (windowMap')
+import XMonad.Actions.WindowBringer (windowMap', WindowBringerConfig(..))
 import XMonad.Actions.CopyWindow (copyWindow, kill1, killAllOtherCopies)
 import XMonad.Util.NamedWindows (getName)
 import Numeric (showHex, readHex)
@@ -52,7 +52,12 @@ decorateUniqueName ws w = do
     return $  name ++ "[" ++ W.tag ws ++ "]" ++ showHex w ""
 
 uniqueNameMap :: X (M.Map String Window)
-uniqueNameMap = windowMap' decorateUniqueName
+uniqueNameMap = windowMap' $ WindowBringerConfig
+                  { menuCommand = "echo"
+                  , menuArgs = []
+                  , windowTitler = decorateUniqueName
+                  , windowFilter = const (return True)
+                  }
 
 readUniqueName :: String -> Maybe (WorkspaceId, Window)
 readUniqueName uniName = (,) ws <$> win

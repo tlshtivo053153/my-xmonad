@@ -93,8 +93,12 @@ initStatusBarWindow = do
 
       let showSignalAction = setPosition statusBarWindow' BottomRight
       let configureEventAction = setPosition statusBarWindow' BottomRight
-      Gdk.on statusBarWindow' #show =<< forkGUI showSignalAction
-      Gdk.on statusBarWindow' #configureEvent =<< constForkGUI False configureEventAction
+      do
+        action <- forkGUI showSignalAction
+        Gdk.on statusBarWindow' #show action
+      do
+        action <- constForkGUI False configureEventAction
+        Gdk.on statusBarWindow' #configureEvent action
       let waitShow = do
             b <- M.takeMVar waitShowing'
             postGUIASync $ if b

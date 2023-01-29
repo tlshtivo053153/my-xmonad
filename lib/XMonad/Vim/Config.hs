@@ -196,7 +196,7 @@ stackKeyHook_ = do
     case m of 
         Normal -> 
             let c' = if c == 0 then "" else show c
-            in UI.writeStatusBarText =<< (c' ++) . unwords . reverse <$> gets stackKeyReadable
+            in UI.writeStatusBarText . (c' ++) . unwords . reverse =<< gets stackKeyReadable
         Insert -> return ()
         Command -> return ()
     grabKeyboardVim
